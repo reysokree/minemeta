@@ -1,0 +1,886 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080812" />
+
+  <title>MineMeta — Coming Soon</title>
+
+  <meta
+    name="description"
+    content="MineMeta brings Minecraft version and mod loader metadata together in one place. An independent community project. Coming soon."
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+  />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #080812;
+      --surface: #10101d;
+      --surface-hover: #151526;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f2ff;
+      --muted: #9291a7;
+      --purple: #a78bfa;
+      --blue: #60a5fa;
+      --gradient: linear-gradient(135deg, #a78bfa, #60a5fa);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Background */
+
+    .background {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      filter: blur(130px);
+      opacity: 0.16;
+      animation: float 12s ease-in-out infinite alternate;
+    }
+
+    .orb.one {
+      background: #7138ff;
+      top: -280px;
+      left: -150px;
+    }
+
+    .orb.two {
+      background: #1768c9;
+      right: -250px;
+      bottom: -250px;
+      animation-delay: -5s;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 55px 55px;
+      mask-image: linear-gradient(to bottom, black, transparent 90%);
+    }
+
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      from {
+        transform: translate(0, 0);
+      }
+      to {
+        transform: translate(90px, 60px);
+      }
+    }
+
+    /* Navigation */
+
+    nav {
+      max-width: 1120px;
+      margin: auto;
+      padding: 25px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeDown .8s ease both;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
+    .brand img {
+      width: 37px;
+      height: 37px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 12px rgba(167,139,250,.35));
+    }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #a78bfa;
+      box-shadow: 0 0 12px #a78bfa;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: .35;
+        box-shadow: 0 0 3px #a78bfa;
+      }
+    }
+
+    /* Hero */
+
+    .hero {
+      width: 100%;
+      max-width: 950px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+      text-align: center;
+    }
+
+    .announcement {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 15px;
+      border: 1px solid rgba(167,139,250,.2);
+      background: rgba(167,139,250,.07);
+      border-radius: 50px;
+      color: #c4b5fd;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      animation: fadeUp .8s .1s both;
+    }
+
+    .announcement i {
+      font-size: 12px;
+    }
+
+    .hero-logo {
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      margin: 40px auto 22px;
+      display: block;
+      filter: drop-shadow(0 0 25px rgba(167,139,250,.3));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+      }
+      50% {
+        transform: translateY(-10px) scale(1.035);
+      }
+    }
+
+    .hero h1 {
+      font-size: clamp(43px, 8vw, 76px);
+      line-height: 1.08;
+      letter-spacing: -5px;
+      font-weight: 900;
+      animation: fadeUp .8s .2s both;
+    }
+
+    .gradient-text {
+      background: var(--gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-description {
+      max-width: 590px;
+      margin: 24px auto 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.9;
+      animation: fadeUp .8s .3s both;
+    }
+
+    /* CTA */
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 13px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+      animation: fadeUp .8s .4s both;
+    }
+
+    .button {
+      min-height: 46px;
+      padding: 0 21px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: .25s ease;
+    }
+
+    .button-primary {
+      color: #080812;
+      background: var(--gradient);
+      box-shadow: 0 0 25px rgba(167,139,250,.15);
+    }
+
+    .button-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 35px rgba(167,139,250,.3);
+    }
+
+    .button-secondary {
+      border: 1px solid var(--border);
+      color: #c6c4d7;
+      background: rgba(255,255,255,.025);
+    }
+
+    .button-secondary:hover {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.2);
+    }
+
+    /* Progress */
+
+    .progress-section {
+      max-width: 330px;
+      margin: 42px auto 0;
+      animation: fadeUp .8s .5s both;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .progress-header span:last-child {
+      color: #c4b5fd;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.07);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 65%;
+      border-radius: inherit;
+      background: var(--gradient);
+      animation: progressGlow 2s infinite alternate;
+    }
+
+    @keyframes progressGlow {
+      to {
+        box-shadow: 0 0 15px #a78bfa;
+      }
+    }
+
+    /* Ecosystems */
+
+    .ecosystems {
+      max-width: 1050px;
+      margin: 20px auto 0;
+      padding: 0 24px 90px;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .section-heading .eyebrow {
+      color: #a78bfa;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      margin-top: 12px;
+      font-size: 25px;
+      letter-spacing: -1px;
+      font-weight: 800;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .ecosystem-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .ecosystem-card {
+      position: relative;
+      padding: 22px 14px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: rgba(16,16,29,.7);
+      text-align: center;
+      overflow: hidden;
+      transition: .3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .ecosystem-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .ecosystem-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at top,
+        rgba(167,139,250,.09),
+        transparent 70%
+      );
+      opacity: 0;
+      transition: .3s;
+    }
+
+    .ecosystem-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(167,139,250,.3);
+      background: var(--surface-hover);
+    }
+
+    .ecosystem-card:hover::before {
+      opacity: 1;
+    }
+
+    .ecosystem-icon {
+      width: 43px;
+      height: 43px;
+      margin: 0 auto 15px;
+      border-radius: 12px;
+      background: rgba(167,139,250,.1);
+      color: #b9a3ff;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+
+    .ecosystem-card h3 {
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .ecosystem-card p {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    /* Information */
+
+    .information {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px 90px;
+    }
+
+    .info-card {
+      padding: 26px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(16,16,29,.65);
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .info-icon {
+      min-width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #a78bfa;
+      background: rgba(167,139,250,.1);
+    }
+
+    .info-card h3 {
+      font-size: 13px;
+      margin-bottom: 9px;
+    }
+
+    .info-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    /* Footer */
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      max-width: 1050px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .footer-brand {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    .footer-copy {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 17px;
+    }
+
+    .footer-right a {
+      color: var(--muted);
+      font-size: 15px;
+      transition: .2s;
+    }
+
+    .footer-right a:hover {
+      color: #c4b5fd;
+      transform: translateY(-2px);
+    }
+
+    /* Entrance animations */
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+
+    @media (max-width: 760px) {
+      .ecosystem-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .hero {
+        padding-top: 85px;
+      }
+
+      .hero h1 {
+        letter-spacing: -3px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      nav {
+        padding: 20px;
+      }
+
+      .hero {
+        padding: 75px 20px 65px;
+      }
+
+      .hero-logo {
+        width: 90px;
+        height: 90px;
+      }
+
+      .hero-description {
+        font-size: 13px;
+      }
+
+      .ecosystem-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .ecosystem-card:last-child {
+        grid-column: span 2;
+      }
+
+      .info-card {
+        padding: 20px;
+      }
+
+      footer {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="background">
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+  <canvas id="particles"></canvas>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#" class="brand">
+      <img src="minemeta.png" alt="MineMeta logo" />
+      MINEMETA
+    </a>
+
+    <div class="nav-status">
+      <span class="status-dot"></span>
+      Under development
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <main>
+    <section class="hero">
+
+      <div class="announcement">
+        <i class="fa-solid fa-code"></i>
+        A community-driven side project
+      </div>
+
+      <img
+        src="minemeta.png"
+        alt="MineMeta"
+        class="hero-logo"
+      />
+
+      <h1>
+        Minecraft metadata,<br />
+        <span class="gradient-text">one destination.</span>
+      </h1>
+
+      <p class="hero-description">
+        We're bringing Minecraft version and mod loader metadata
+        together into one convenient place. Explore multiple
+        ecosystems, discover their metadata, and make development
+        a little easier.
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://minemeta.vercel.app/" class="button button-primary">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          Explore MineMeta
+        </a>
+
+        <a href="#ecosystems" class="button button-secondary">
+          <i class="fa-solid fa-layer-group"></i>
+          Explore ecosystems
+        </a>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>PROJECT STATUS</span>
+          <span>Coming soon</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Ecosystems -->
+    <section class="ecosystems" id="ecosystems">
+
+      <div class="section-heading">
+        <span class="eyebrow">One place. Multiple ecosystems.</span>
+        <h2>Built around Minecraft metadata.</h2>
+        <p>Bringing information from five established ecosystems together.</p>
+      </div>
+
+      <div class="ecosystem-grid">
+
+        <article class="ecosystem-card">
+          <div class="ecosystem-icon">
+            <i class="fa-solid fa-cube"></i>
+          </div>
+          <h3>Minecraft</h3>
+          <p>Official game version metadata</p>
+        </article>
+
+        <article class="ecosystem-card">
+          <div class="ecosystem-icon">
+            <i class="fa-solid fa-feather"></i>
+          </div>
+          <h3>Fabric</h3>
+          <p>Loader and game versions</p>
+        </article>
+
+        <article class="ecosystem-card">
+          <div class="ecosystem-icon">
+            <i class="fa-solid fa-leaf"></i>
+          </div>
+          <h3>Quilt</h3>
+          <p>Loader metadata</p>
+        </article>
+
+        <article class="ecosystem-card">
+          <div class="ecosystem-icon">
+            <i class="fa-solid fa-hammer"></i>
+          </div>
+          <h3>Forge</h3>
+          <p>Forge version metadata</p>
+        </article>
+
+        <article class="ecosystem-card">
+          <div class="ecosystem-icon">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <h3>NeoForge</h3>
+          <p>NeoForge version metadata</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Independence notice -->
+    <section class="information">
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+
+        <div>
+          <h3>Independent by design.</h3>
+          <p>
+            MineMeta is an independent community project. It brings
+            metadata from official distributions together for easier
+            exploration. It does not replace, own, or officially
+            represent Minecraft, Fabric, Quilt, Forge, or NeoForge.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-brand">MINEMETA</div>
+
+    <div class="footer-copy">
+      A fun side project. Built with curiosity.
+    </div>
+
+    <div class="footer-right">
+      <a href="https://minemeta.vercel.app/" aria-label="Website">
+        <i class="fa-solid fa-globe"></i>
+      </a>
+      <a href="https://github.com/ReysoKree" aria-label="GitHub">
+        <i class="fa-brands fa-github"></i>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    // Particle background
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+
+    let particles = [];
+    let width, height;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 1.5 + 0.3;
+        this.speed = Math.random() * 0.3 + 0.1;
+        this.opacity = Math.random() * 0.45 + 0.1;
+      }
+
+      update() {
+        this.y -= this.speed;
+
+        if (this.y < -5) {
+          this.y = height + 5;
+          this.x = Math.random() * width;
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(167,139,250,${this.opacity})`;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      const count = Math.min(
+        75,
+        Math.floor((width * height) / 14000)
+      );
+
+      particles = Array.from(
+        { length: count },
+        () => new Particle()
+      );
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach(particle => {
+        if (!reducedMotion) particle.update();
+        particle.draw();
+      });
+
+      if (!reducedMotion) {
+        requestAnimationFrame(animateParticles);
+      }
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+      if (reducedMotion) animateParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    animateParticles();
+
+    // Reveal ecosystem cards on scroll
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    document.querySelectorAll(".ecosystem-card").forEach(
+      (card, index) => {
+        card.style.transitionDelay = `${index * 100}ms`;
+        observer.observe(card);
+      }
+    );
+
+  </script>
+
+</body>
+</html>
